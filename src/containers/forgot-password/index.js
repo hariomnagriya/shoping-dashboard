@@ -74,7 +74,7 @@ class ForgotPassword extends Component {
       }
 
       const response = await axios.post(
-        "http://192.168.2.112:8080/forgotPassword",
+        "http://192.168.2.107:8080/forgotPassword",
         obj
       );
       if (response) {

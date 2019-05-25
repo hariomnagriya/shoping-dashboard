@@ -43,6 +43,8 @@ const User = React.lazy(() => import("./views/Users/User"));
 const Product = React.lazy(() => import("./views/product-list"));
 // const Update = React.lazy(() => import("./views/product-list"));
 const AddProduct = React.lazy(() => import("./views/add-product"));
+const CategoryList = React.lazy(() => import("./views/Category/categoryList"));
+const Category = React.lazy(() => import("./views/Category/category"));
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   // { path: '/', exact: true, name: 'Home' },
@@ -88,6 +90,8 @@ const routes = [
     name: "Brand Buttons",
     component: BrandButtons
   },
+  { path: "/cat-list", exact: true, name: "Category-List", component: CategoryList },
+  { path: "/cat-list/:id", exact: true, name: "Category-Detail", component: Category },
   { path: "/icons", exact: true, name: "Icons", component: CoreUIIcons },
   { path: "/icons/coreui-icons", name: "CoreUI Icons", component: CoreUIIcons },
   { path: "/icons/flags", name: "Flags", component: Flags },

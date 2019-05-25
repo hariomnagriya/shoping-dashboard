@@ -8,9 +8,12 @@ const BASE_URL = "http://192.168.2.107:8080/";
 //import usersData from './UsersData'
 
 class UserRow extends Component {
-  //const user = props.user
-  //const userLink = `/users/${user._id}`
-
+  constructor(props) {
+    super(props);
+    this.state = {
+      Cid: this.props.cat._id
+    }
+  }
   getBadge = (status) => {
     return status === 'Active' ? 'success' :
       status === 'Inactive' ? 'danger ' :
@@ -21,36 +24,64 @@ class UserRow extends Component {
   onSubmit = async e => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
+
       const response = await axios.delete(
-        "http://192.168.2.107:8080/deleteUser/" + this.props.obj._id
+        "http://192.168.2.107:8080/deleteCategory/" + this.props.obj._id
       );
-      this.props.history.push("/users");
+      this.props.history.push("/cat-list");
     } catch (error) {
       console.log(error);
     }
   };
+  componentDidMount = async () => {
+    //  const { user } = this.state;
+    const { Cid } = this.state
+    const data = { Cid };
+    const response = await axios.post(
+      "http://192.168.2.107:8080/showproductCount/", data
+    );
+    // console.log("result  :-", this.props.match.params.id);
+    // const result = res.data.result1[0];
+    // this.setState({ user: result });
+    // console.log("users :-", result)
+    this.setState({
+      Cid: response.data.result
+    });
+    if (!response) {
+      console.log("error");
+    }
+  }
+
+  //   onCount = async (e) => {
+  //      e.preventDefault();
+  //     try {
+  //       const{Cid}=this.state
+  //       const data = {Cid};
+
+  //       const response = await axios.post(
+  //         "http://192.168.2.107:8080/showproductCount/",data
+  //       );
+  //       return response.data.result;
+  // //this.props.history.push("/cat-list");
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
 
   render() {
-    console.log("indexxxx", this.props.index);
-    console.log("skippppp", this.props.skip);
 
     return (
-
       <>
         {/* key={user._id.toString()} */}
         <tr >
-          <th scope="row"><Link to={"/users/" + this.props.user._id}>{this.props.index + this.props.skip + 1}</Link></th>
-          <th><Image src={BASE_URL + this.props.user.file} width="80px" height="80px" /></th>
-          <td><Link to={"/users/" + this.props.user._id}>{this.props.user.name}</Link></td>
-          <td>{this.props.user.email}</td>
-          <td>{this.props.user.mobile_no}</td>
-          <td>{this.props.user.gender}</td>
-          <td><Link to={"/users/" + this.props.user._id}><Badge color={this.getBadge(this.props.user.status)}>{this.props.user.status}</Badge></Link></td>
-          <td>{this.props.user.createTime}</td>
-          <td>{this.props.user.lastLogin}</td>
+          <th scope="row"><Link to={"/cat-list/" + this.props.cat._id}>{this.props.index + this.props.skip + 1}</Link></th>
+          <td><Link to={"/cat-list/" + this.props.cat._id}>{this.props.cat.category}</Link></td>
+          <td><Link to={"/cat-list/" + this.props.cat._id}><Badge color={this.getBadge(this.props.cat.status)}>{this.props.cat.status}</Badge></Link></td>
+          <td >{this.state.Cid}</td>
+          <td>{this.props.cat.createTime}</td>
+          <td>{this.props.cat.updateTime}</td>
           <td colSpan="2">
-            <Link to={"/users/" + this.props.user._id}>
+            <Link to={"/cat-list/" + this.props.cat._id}>
               <Button variant="outline-primary"><i class="fas fa-edit"></i></Button>
             </Link>&nbsp;&nbsp;
         <Button variant="outline-danger"
@@ -82,11 +113,11 @@ class UserRow extends Component {
   }
 }
 
-class Users extends Component {
+class CategoryList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: [], name: "", order: "", status: "", currentPage: 1,
+      cat: [], name: "", order: "", status: "", currentPage: 1,
       totalPageRec: 0,
       pageLimit: 1,
       skip: 0
@@ -101,16 +132,16 @@ class Users extends Component {
     const skip = (currentPage - 1) * pageLimit;
     const limit = pageLimit;
     const obj = { skip, limit };
-    const res = await axios.post("http://192.168.2.107:8080/showUser1");
+    const res = await axios.post("http://192.168.2.107:8080/showCat1");
     var count = res.data.result
     if (count % 2 != 0) {
       count = count + 1;
     }
     this.setState({ totalPageRec: count });
-    const response = await axios.post("http://192.168.2.107:8080/getuser", obj);
+    const response = await axios.post("http://192.168.2.107:8080/getCat", obj);
 
     const result = response.data.result1;
-    this.setState({ user: result, skip });
+    this.setState({ cat: result, skip });
     if (!result) {
       console.log("error");
     }
@@ -119,7 +150,7 @@ class Users extends Component {
 
     try {
       const response = await axios.delete(
-        "http://192.168.2.107:8080/deleteUser/" + productId)
+        "http://192.168.2.107:8080/deleteCategory/" + productId)
     } catch (error) {
       console.log(error);
     }
@@ -166,36 +197,22 @@ class Users extends Component {
 
   onSubmit = async e => {
     e.preventDefault();
-    this.setState({ user: "" });
+    this.setState({ cat: "" });
     const { name, order, status } = this.state;
 
     const data = { name, order, status };
 
     const response = await axios.post(
-      "http://192.168.2.107:8080/getUserByName", data
+      "http://192.168.2.107:8080/getCatByNamee", data
     );
     if (response) {
-      this.setState({ name: "", order: "", status:"" });
+      this.setState({ name: "", order: "", status: "" });
       const result = response.data.result1;
-      this.setState({ user: result });
+      this.setState({ cat: result });
     }
   };
 
-  // onSearch = async e => {
-  //   e.preventDefault();
-  //   this.setState({ user: "" });
-  //   const { order } = this.state;
 
-  //   const data = { order };
-
-  //   const response = await axios.post(
-  //     "http://192.168.2.107:8080/getUserByOrder", data
-  //   );
-  //   if (response) {
-  //     const result = response.data.result;
-  //     this.setState({ user: result });
-  //   }
-  // };
 
   onInputChange = e => {
     const { target } = e;
@@ -209,8 +226,8 @@ class Users extends Component {
 
   render() {
 
-    const { user, name, order, currentPage, skip ,status} = this.state;
-    console.log("userssss  ", user);
+    const { cat, category, order, currentPage, skip, status } = this.state;
+    console.log("userssss  ", cat);
 
     // const userList = usersData.filter((user) => user.id < 10)
 
@@ -222,14 +239,15 @@ class Users extends Component {
               <CardHeader>
                 <FormGroup inline>
                   <Form onSubmit={this.onSubmit} inline>
-                    <i className="fa fa-align-justify"></i>&nbsp;&nbsp;<Link onClick={this.getData} > Users List </Link>&nbsp;&nbsp;
-                    <FormControl type="text" name="name" placeholder="search by name" value={name} onChange={this.onInputChange} className="mr-sm-2" />
+                    <i className="fa fa-align-justify"></i>&nbsp;&nbsp;<Link onClick={this.getData} > Category List </Link>&nbsp;&nbsp;
+                    <FormControl type="text" name="name" placeholder="Search by name" value={category} onChange={this.onInputChange} className="mr-sm-2" />
                     &nbsp;
                     <FormControl as="select" name="order" value={order} onChange={this.onInputChange} className="mr-sm-2" >
                       <option value={null}>---Name---</option>
                       <option value="assending" >Order By Name A to Z</option>
                       <option value="desending" >Order By Name Z to A</option>
-                    </FormControl>&nbsp;
+                    </FormControl>
+                    &nbsp;
                     <FormControl as="select" name="status" value={status} onChange={this.onInputChange} className="mr-sm-2" >
                       <option value={null}>---Status---</option>
                       <option value="Active">Active</option>
@@ -258,21 +276,18 @@ class Users extends Component {
                   <thead >
                     <tr >
                       <th scope="col">S.No.</th>
-                      <th scope="col">Image</th>
                       <th scope="col">Name</th>
-                      <th scope="col">Email</th>
-                      <th scope="col">Mobile</th>
-                      <th scope="col">Gender</th>
                       <th scope="col">Status</th>
-                      <th scope="col">create Time</th>
-                      <th scope="col">Last Login</th>
+                      <th scope="col">Total Product</th>
+                      <th scope="col">Create Time</th>
+                      <th scope="col">Update Time</th>
                       <th scope="col" colSpan="2">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
 
-                    {user && user.length ? user.map((user, index) =>
-                      <UserRow obj={user} key={user._id} user={user} index={index} skip={this.state.skip} onDelete={this.onDelete} />)
+                    {cat && cat.length ? cat.map((cat, index) =>
+                      <UserRow obj={cat} key={cat._id} cat={cat} index={index} skip={this.state.skip} onDelete={this.onDelete} />)
                       : null}
 
 
@@ -294,4 +309,4 @@ class Users extends Component {
   }
 }
 
-export default Users;
+export default CategoryList;
