@@ -44,7 +44,7 @@
     "sweetalert2": "^8.11.1"
   },
   "devDependencies": {
-    "react-scripts": "^3.0.1"
+    "react-scripts": "^5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
